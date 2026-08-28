@@ -15,7 +15,8 @@
   "type": "commonjs",
   "main": "index.js",
   "scripts": {
-    "hello": "echo Hello from our e-commerce project"
+    "hello": "echo Hello from our e-commerce project",
+    "format": "prettier --write ."
   },
   "dependencies": {
     "lodash": "^4.18.1"
