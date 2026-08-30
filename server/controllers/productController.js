@@ -1,7 +1,9 @@
 import mongoose from 'mongoose'
-import { getAllProducts,
-   getProductById,
-   } from '../services/productService.js'
+import {
+  getAllProducts,
+  getProductById,
+  createProduct,
+} from '../services/productService.js'
 
 export const getProducts = async (req, res) => {
   try {
@@ -35,6 +37,18 @@ export const getProduct = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       message: 'Failed to retrieve product',
+      error: error.message,
+    })
+  }
+}
+export const createProductController = async (req, res) => {
+  try {
+    const product = await createProduct(req.body)
+
+    res.status(201).json(product)
+  } catch (error) {
+    res.status(400).json({
+      message: 'Failed to create product',
       error: error.message,
     })
   }

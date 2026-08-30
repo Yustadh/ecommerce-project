@@ -7,3 +7,6 @@ export const getAllProducts = async () => {
 export const getProductById = async (id) => {
   return Product.findById(id)
 }
+export const createProduct = async (productData) => {
+  return Product.create(productData)
+}
