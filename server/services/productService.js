@@ -1,21 +1,5 @@
-const products = [
-  {
-    id: 1,
-    name: 'Laptop',
-    price: 1200,
-  },
-  {
-    id: 2,
-    name: 'Wireless Headphones',
-    price: 100,
-  },
-  {
-    id: 3,
-    name: 'Smartphone',
-    price: 800,
-  },
-]
+import Product from '../models/productModel.js'
 
-export const getAllProducts = () => {
-  return products
+export const getAllProducts = async () => {
+  return Product.find()
 }
