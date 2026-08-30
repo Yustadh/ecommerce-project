@@ -1,7 +1,41 @@
-import { getAllProducts } from '../services/productService.js'
+import mongoose from 'mongoose'
+import { getAllProducts,
+   getProductById,
+   } from '../services/productService.js'
 
 export const getProducts = async (req, res) => {
-  const products = await getAllProducts()
+  try {
+    const products = await getAllProducts()
 
-  res.json(products)
+    res.status(200).json(products)
+  } catch (error) {
+    res.status(500).json({
+      message: 'Failed to retrieve products',
+      error: error.message,
+    })
+  }
+}
+export const getProduct = async (req, res) => {
+  try {
+    if (!mongoose.isValidObjectId(req.params.id)) {
+      return res.status(400).json({
+        message: 'Invalid product ID',
+      })
+    }
+
+    const product = await getProductById(req.params.id)
+
+    if (!product) {
+      return res.status(404).json({
+        message: 'Product not found',
+      })
+    }
+
+    res.status(200).json(product)
+  } catch (error) {
+    res.status(500).json({
+      message: 'Failed to retrieve product',
+      error: error.message,
+    })
+  }
 }
