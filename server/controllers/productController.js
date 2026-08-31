@@ -1,4 +1,3 @@
-import mongoose from 'mongoose'
 import {
   getAllProducts,
   getProductById,
@@ -18,12 +17,6 @@ export const getProducts = async (req, res, next) => {
 }
 export const getProduct = async (req, res, next) => {
   try {
-    if (!mongoose.isValidObjectId(req.params.id)) {
-      return res.status(400).json({
-        message: 'Invalid product ID',
-      })
-    }
-
     const product = await getProductById(req.params.id)
 
     if (!product) {
@@ -48,12 +41,6 @@ export const createProductController = async (req, res, next) => {
 }
 export const updateProduct = async (req, res, next) => {
   try {
-    if (!mongoose.isValidObjectId(req.params.id)) {
-      return res.status(400).json({
-        message: 'Invalid product ID',
-      })
-    }
-
     const product = await updateProductById(req.params.id, req.body)
 
     if (!product) {
@@ -69,12 +56,6 @@ export const updateProduct = async (req, res, next) => {
 }
 export const deleteProduct = async (req, res, next) => {
   try {
-    if (!mongoose.isValidObjectId(req.params.id)) {
-      return res.status(400).json({
-        message: 'Invalid product ID',
-      })
-    }
-
     const product = await deleteProductById(req.params.id)
 
     if (!product) {
