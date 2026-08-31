@@ -16,3 +16,6 @@ export const updateProductById = async (id, productData) => {
     runValidators: true,
   })
 }
+export const deleteProductById = async (id) => {
+  return Product.findByIdAndDelete(id)
+}
