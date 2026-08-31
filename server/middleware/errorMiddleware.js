@@ -7,9 +7,16 @@ export const errorMiddleware = (err, req, res, next) => {
       error: err.message,
     })
   }
+
   if (err.name === 'CastError') {
     return res.status(400).json({
       message: 'Invalid product ID',
+    })
+  }
+
+  if (err.code === 11000) {
+    return res.status(409).json({
+      message: 'Duplicate resource',
     })
   }
 
