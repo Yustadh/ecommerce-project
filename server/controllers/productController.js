@@ -3,6 +3,7 @@ import {
   getAllProducts,
   getProductById,
   createProduct,
+  updateProductById,
 } from '../services/productService.js'
 
 export const getProducts = async (req, res) => {
@@ -49,6 +50,30 @@ export const createProductController = async (req, res) => {
   } catch (error) {
     res.status(400).json({
       message: 'Failed to create product',
+      error: error.message,
+    })
+  }
+}
+export const updateProduct = async (req, res) => {
+  try {
+    if (!mongoose.isValidObjectId(req.params.id)) {
+      return res.status(400).json({
+        message: 'Invalid product ID',
+      })
+    }
+
+    const product = await updateProductById(req.params.id, req.body)
+
+    if (!product) {
+      return res.status(404).json({
+        message: 'Product not found',
+      })
+    }
+
+    res.status(200).json(product)
+  } catch (error) {
+    res.status(400).json({
+      message: 'Failed to update product',
       error: error.message,
     })
   }

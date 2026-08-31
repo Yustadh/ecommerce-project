@@ -10,3 +10,9 @@ export const getProductById = async (id) => {
 export const createProduct = async (productData) => {
   return Product.create(productData)
 }
+export const updateProductById = async (id, productData) => {
+  return Product.findByIdAndUpdate(id, productData, {
+    new: true,
+    runValidators: true,
+  })
+}
