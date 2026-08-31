@@ -3,6 +3,7 @@ import express from 'express'
 import cors from 'cors'
 import productRoutes from './routes/productRoutes.js'
 import { connectDB } from './config/db.js'
+import { errorMiddleware } from './middleware/errorMiddleware.js'
 
 const app = express()
 const PORT = 5000
@@ -18,7 +19,7 @@ app.get('/', (req, res) => {
 app.get('/api/health', (req, res) => {
   res.send('API is healthy')
 })
-
+app.use(errorMiddleware)
 connectDB()
 
 app.listen(PORT, () => {

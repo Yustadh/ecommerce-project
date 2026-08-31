@@ -7,19 +7,16 @@ import {
   deleteProductById,
 } from '../services/productService.js'
 
-export const getProducts = async (req, res) => {
+export const getProducts = async (req, res, next) => {
   try {
     const products = await getAllProducts()
 
     res.status(200).json(products)
   } catch (error) {
-    res.status(500).json({
-      message: 'Failed to retrieve products',
-      error: error.message,
-    })
+    next(error)
   }
 }
-export const getProduct = async (req, res) => {
+export const getProduct = async (req, res, next) => {
   try {
     if (!mongoose.isValidObjectId(req.params.id)) {
       return res.status(400).json({
@@ -37,25 +34,19 @@ export const getProduct = async (req, res) => {
 
     res.status(200).json(product)
   } catch (error) {
-    res.status(500).json({
-      message: 'Failed to retrieve product',
-      error: error.message,
-    })
+    next(error)
   }
 }
-export const createProductController = async (req, res) => {
+export const createProductController = async (req, res, next) => {
   try {
     const product = await createProduct(req.body)
 
     res.status(201).json(product)
   } catch (error) {
-    res.status(400).json({
-      message: 'Failed to create product',
-      error: error.message,
-    })
+    next(error)
   }
 }
-export const updateProduct = async (req, res) => {
+export const updateProduct = async (req, res, next) => {
   try {
     if (!mongoose.isValidObjectId(req.params.id)) {
       return res.status(400).json({
@@ -73,13 +64,10 @@ export const updateProduct = async (req, res) => {
 
     res.status(200).json(product)
   } catch (error) {
-    res.status(400).json({
-      message: 'Failed to update product',
-      error: error.message,
-    })
+    next(error)
   }
 }
-export const deleteProduct = async (req, res) => {
+export const deleteProduct = async (req, res, next) => {
   try {
     if (!mongoose.isValidObjectId(req.params.id)) {
       return res.status(400).json({
@@ -97,9 +85,6 @@ export const deleteProduct = async (req, res) => {
 
     res.status(204).send()
   } catch (error) {
-    res.status(500).json({
-      message: 'Failed to delete product',
-      error: error.message,
-    })
+    next(error)
   }
 }
