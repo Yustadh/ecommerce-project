@@ -13,6 +13,11 @@ export const errorMiddleware = (err, req, res, next) => {
       message: 'Invalid product ID',
     })
   }
+  if (err instanceof SyntaxError && err.status === 400 && 'body' in err) {
+    return res.status(400).json({
+      message: 'Invalid JSON',
+    })
+  }
 
   if (err.code === 11000) {
     return res.status(409).json({
