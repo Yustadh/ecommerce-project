@@ -7,15 +7,25 @@ export const getAllProducts = async () => {
 export const getProductById = async (id) => {
   return Product.findById(id)
 }
+
 export const createProduct = async (productData) => {
   return Product.create(productData)
 }
+
 export const updateProductById = async (id, productData) => {
   return Product.findByIdAndUpdate(id, productData, {
     new: true,
     runValidators: true,
   })
 }
+
+export const patchProductById = async (id, productData) => {
+  return Product.findByIdAndUpdate(id, productData, {
+    new: true,
+    runValidators: true,
+  })
+}
+
 export const deleteProductById = async (id) => {
   return Product.findByIdAndDelete(id)
 }
