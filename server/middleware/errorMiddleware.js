@@ -4,7 +4,7 @@ export const errorMiddleware = (err, req, res, next) => {
   if (err.name === 'ValidationError') {
     return res.status(400).json({
       message: 'Validation failed',
-      error: err.message,
+      errors: Object.values(err.errors).map((error) => error.message),
     })
   }
 
