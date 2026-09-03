@@ -1,4 +1,5 @@
 import express from 'express'
+import { validateProduct } from '../middleware/productValidationMiddleware.js'
 import {
   getProducts,
   getProduct,
@@ -12,7 +13,7 @@ const router = express.Router()
 
 router.get('/', getProducts)
 router.get('/:id', getProduct)
-router.post('/', createProductController)
+router.post('/', validateProduct, createProductController)
 router.put('/:id', updateProduct)
 router.patch('/:id', patchProduct)
 router.delete('/:id', deleteProduct)
