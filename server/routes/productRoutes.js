@@ -1,5 +1,8 @@
 import express from 'express'
-import { validateProduct } from '../middleware/productValidationMiddleware.js'
+import {
+  validateProduct,
+  validateUpdateProduct,
+} from '../middleware/productValidationMiddleware.js'
 import {
   getProducts,
   getProduct,
@@ -15,7 +18,7 @@ router.get('/', getProducts)
 router.get('/:id', getProduct)
 router.post('/', validateProduct, createProductController)
 router.put('/:id', updateProduct)
-router.patch('/:id', patchProduct)
+router.patch('/:id', validateUpdateProduct, patchProduct)
 router.delete('/:id', deleteProduct)
 
 export default router

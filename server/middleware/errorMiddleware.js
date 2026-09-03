@@ -8,7 +8,7 @@ export const errorMiddleware = (err, req, res, next) => {
     })
   }
 
-  if (err.name === 'CastError') {
+  if (err.name === 'CastError' && err.path === '_id') {
     return res.status(400).json({
       message: 'Invalid product ID',
     })
