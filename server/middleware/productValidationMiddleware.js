@@ -31,6 +31,11 @@ export const validateProduct = (req, res, next) => {
 
 export const validateUpdateProduct = (req, res, next) => {
   const errors = []
+
+  if (Object.keys(req.body).length === 0) {
+    errors.push('At least one field is required for an update')
+  }
+
   const allowedFields = ['name', 'price', 'category', 'stock']
 
   for (const field of Object.keys(req.body)) {
