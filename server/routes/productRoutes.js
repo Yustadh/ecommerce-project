@@ -17,7 +17,7 @@ const router = express.Router()
 router.get('/', getProducts)
 router.get('/:id', getProduct)
 router.post('/', validateProduct, createProductController)
-router.put('/:id', updateProduct)
+router.put('/:id', validateProduct, updateProduct)
 router.patch('/:id', validateUpdateProduct, patchProduct)
 router.delete('/:id', deleteProduct)
 
