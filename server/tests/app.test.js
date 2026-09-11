@@ -50,6 +50,71 @@ describe('Product API', () => {
     response.body.every((product) => product.category === 'Electronics'),
   ).toBe(true)
 })
+  test('GET /api/products?minPrice=100&maxPrice=500 should return products within price range', async () => {
+    await request(app).post('/api/products').send({
+      name: 'Budget Product',
+      price: 50,
+      category: 'Test',
+      stock: 10,
+    })
+
+    await request(app).post('/api/products').send({
+      name: 'Midrange Product',
+      price: 300,
+      category: 'Test',
+      stock: 10,
+    })
+
+    await request(app).post('/api/products').send({
+      name: 'Expensive Product',
+      price: 800,
+      category: 'Test',
+      stock: 10,
+    })
+
+    const response = await request(app)
+      .get('/api/products')
+      .query({ minPrice: 100, maxPrice: 500 })
+      .expect(200)
+
+    expect(response.body).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          name: 'Midrange Product',
+          price: 300,
+        }),
+      ]),
+    )
+
+    expect(
+      response.body.every(
+        (product) => product.price >= 100 && product.price <= 500,
+      ),
+    ).toBe(true)
+  })
+
+  test('GET /api/products?minPrice should reject an invalid minimum price', async () => {
+    const response = await request(app)
+      .get('/api/products')
+      .query({ minPrice: 'abc' })
+      .expect(400)
+
+    expect(response.body.message).toBe('Invalid minPrice')
+  })
+
+  test('GET /api/products should reject a minimum price greater than maximum price', async () => {
+    const response = await request(app)
+      .get('/api/products')
+      .query({
+        minPrice: 500,
+        maxPrice: 100,
+      })
+      .expect(400)
+
+    expect(response.body.message).toBe(
+      'minPrice cannot be greater than maxPrice',
+    )
+  })
   test('POST /api/products should create a new product', async () => {
   const newProduct = {
     name: 'Test Product',

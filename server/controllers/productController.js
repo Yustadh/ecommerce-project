@@ -15,6 +15,46 @@ export const getProducts = async (req, res, next) => {
       filters.category = req.query.category
     }
 
+    if (req.query.minPrice !== undefined) {
+      const minPrice = Number(req.query.minPrice)
+
+      if (Number.isNaN(minPrice) || minPrice < 0) {
+        return res.status(400).json({
+          message: 'Invalid minPrice',
+        })
+      }
+
+      filters.price = {
+        ...filters.price,
+        $gte: minPrice,
+      }
+    }
+
+    if (req.query.maxPrice !== undefined) {
+      const maxPrice = Number(req.query.maxPrice)
+
+      if (Number.isNaN(maxPrice) || maxPrice < 0) {
+        return res.status(400).json({
+          message: 'Invalid maxPrice',
+        })
+      }
+
+      filters.price = {
+        ...filters.price,
+        $lte: maxPrice,
+      }
+    }
+
+    if (
+      filters.price?.$gte !== undefined &&
+      filters.price?.$lte !== undefined &&
+      filters.price.$gte > filters.price.$lte
+    ) {
+      return res.status(400).json({
+        message: 'minPrice cannot be greater than maxPrice',
+      })
+    }
+
     const products = await getAllProducts(filters)
 
     res.status(200).json(products)
