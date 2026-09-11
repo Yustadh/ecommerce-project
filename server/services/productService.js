@@ -14,14 +14,14 @@ export const createProduct = async (productData) => {
 
 export const updateProductById = async (id, productData) => {
   return Product.findByIdAndUpdate(id, productData, {
-    new: true,
+    returnDocument: 'after',
     runValidators: true,
   })
 }
 
 export const patchProductById = async (id, productData) => {
   return Product.findByIdAndUpdate(id, productData, {
-    new: true,
+    returnDocument: 'after',
     runValidators: true,
   })
 }
