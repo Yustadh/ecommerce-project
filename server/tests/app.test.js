@@ -17,6 +17,39 @@ describe('Product API', () => {
     expect(response.statusCode).toBe(200)
     expect(Array.isArray(response.body)).toBe(true)
   })
+  test('GET /api/products?category=Electronics should return only matching products', async () => {
+  await request(app).post('/api/products').send({
+    name: 'Test Phone',
+    price: 500,
+    category: 'Electronics',
+    stock: 10,
+  })
+
+  await request(app).post('/api/products').send({
+    name: 'Test Shirt',
+    price: 50,
+    category: 'Fashion',
+    stock: 20,
+  })
+
+  const response = await request(app)
+    .get('/api/products')
+    .query({ category: 'Electronics' })
+    .expect(200)
+
+  expect(response.body).toEqual(
+    expect.arrayContaining([
+      expect.objectContaining({
+        name: 'Test Phone',
+        category: 'Electronics',
+      }),
+    ]),
+  )
+
+  expect(
+    response.body.every((product) => product.category === 'Electronics'),
+  ).toBe(true)
+})
   test('POST /api/products should create a new product', async () => {
   const newProduct = {
     name: 'Test Product',

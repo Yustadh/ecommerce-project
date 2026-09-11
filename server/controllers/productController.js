@@ -9,7 +9,13 @@ import {
 
 export const getProducts = async (req, res, next) => {
   try {
-    const products = await getAllProducts()
+    const filters = {}
+
+    if (req.query.category) {
+      filters.category = req.query.category
+    }
+
+    const products = await getAllProducts(filters)
 
     res.status(200).json(products)
   } catch (error) {
