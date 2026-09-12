@@ -1,7 +1,20 @@
 import Product from '../models/productModel.js'
 
-export const getAllProducts = async (filters = {}) => {
-  return Product.find(filters)
+export const getAllProducts = async (
+  filters = {},
+  { page = 1, limit = 10 } = {},
+) => {
+  const skip = (page - 1) * limit
+
+  const [products, total] = await Promise.all([
+    Product.find(filters).skip(skip).limit(limit),
+    Product.countDocuments(filters),
+  ])
+
+  return {
+    products,
+    total,
+  }
 }
 
 export const getProductById = async (id) => {

@@ -11,12 +11,120 @@ describe('API health check', () => {
 })
 
 describe('Product API', () => {
-  test('GET /api/products should return an array of products', async () => {
+  test('GET /api/products should return paginated products', async () => {
     const response = await request(app).get('/api/products')
 
     expect(response.statusCode).toBe(200)
-    expect(Array.isArray(response.body)).toBe(true)
+    expect(Array.isArray(response.body.products)).toBe(true)
+    expect(response.body.pagination).toEqual(
+      expect.objectContaining({
+        page: 1,
+        limit: 10,
+      }),
+    )
   })
+  test('GET /api/products?page=1&limit=2 should return the requested number of products', async () => {
+    await request(app).post('/api/products').send({
+      name: 'Pagination Product 1',
+      price: 100,
+      category: 'PaginationPage1',
+      stock: 10,
+    })
+
+    await request(app).post('/api/products').send({
+      name: 'Pagination Product 2',
+      price: 200,
+      category: 'PaginationPage1',
+      stock: 10,
+    })
+
+    await request(app).post('/api/products').send({
+      name: 'Pagination Product 3',
+      price: 300,
+      category: 'PaginationPage1',
+      stock: 10,
+    })
+
+    const response = await request(app)
+      .get('/api/products')
+      .query({
+        category: 'PaginationPage1',
+        page: 1,
+        limit: 2,
+      })
+      .expect(200)
+
+    expect(response.body.products).toHaveLength(2)
+    expect(response.body.pagination).toEqual(
+      expect.objectContaining({
+        page: 1,
+        limit: 2,
+        total: 3,
+        totalPages: 2,
+      }),
+    )
+  })
+
+  test('GET /api/products?page=2&limit=2 should return the second page', async () => {
+    await request(app).post('/api/products').send({
+      name: 'Page Product 1',
+      price: 100,
+      category: 'PaginationPage2',
+      stock: 10,
+    })
+
+    await request(app).post('/api/products').send({
+      name: 'Page Product 2',
+      price: 200,
+      category: 'PaginationPage2',
+      stock: 10,
+    })
+
+    await request(app).post('/api/products').send({
+      name: 'Page Product 3',
+      price: 300,
+      category: 'PaginationPage2',
+      stock: 10,
+    })
+
+    const response = await request(app)
+      .get('/api/products')
+      .query({
+        category: 'PaginationPage2',
+        page: 2,
+        limit: 2,
+      })
+      .expect(200)
+
+    expect(response.body.products).toHaveLength(1)
+    expect(response.body.pagination).toEqual(
+      expect.objectContaining({
+        page: 2,
+        limit: 2,
+        total: 3,
+        totalPages: 2,
+      }),
+    )
+  })
+
+  test('GET /api/products?page should reject an invalid page', async () => {
+    const response = await request(app)
+      .get('/api/products')
+      .query({ page: 0 })
+      .expect(400)
+
+    expect(response.body.message).toBe('Invalid page')
+  })
+
+  test('GET /api/products?limit should reject an invalid limit', async () => {
+    const response = await request(app)
+      .get('/api/products')
+      .query({ limit: 101 })
+      .expect(400)
+
+    expect(response.body.message).toBe('Invalid limit')
+  })
+
   test('GET /api/products?category=Electronics should return only matching products', async () => {
   await request(app).post('/api/products').send({
     name: 'Test Phone',
@@ -37,7 +145,7 @@ describe('Product API', () => {
     .query({ category: 'Electronics' })
     .expect(200)
 
-  expect(response.body).toEqual(
+  expect(response.body.products).toEqual(
     expect.arrayContaining([
       expect.objectContaining({
         name: 'Test Phone',
@@ -47,7 +155,9 @@ describe('Product API', () => {
   )
 
   expect(
-    response.body.every((product) => product.category === 'Electronics'),
+    response.body.products.every(
+      (product) => product.category === 'Electronics',
+    ),
   ).toBe(true)
 })
   test('GET /api/products?minPrice=100&maxPrice=500 should return products within price range', async () => {
@@ -77,7 +187,7 @@ describe('Product API', () => {
       .query({ minPrice: 100, maxPrice: 500 })
       .expect(200)
 
-    expect(response.body).toEqual(
+    expect(response.body.products).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
           name: 'Midrange Product',
@@ -87,7 +197,7 @@ describe('Product API', () => {
     )
 
     expect(
-      response.body.every(
+      response.body.products.every(
         (product) => product.price >= 100 && product.price <= 500,
       ),
     ).toBe(true)

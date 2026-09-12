@@ -55,9 +55,35 @@ export const getProducts = async (req, res, next) => {
       })
     }
 
-    const products = await getAllProducts(filters)
+    const page = Number(req.query.page ?? 1)
+    const limit = Number(req.query.limit ?? 10)
 
-    res.status(200).json(products)
+    if (!Number.isInteger(page) || page < 1) {
+      return res.status(400).json({
+        message: 'Invalid page',
+      })
+    }
+
+    if (!Number.isInteger(limit) || limit < 1 || limit > 100) {
+      return res.status(400).json({
+        message: 'Invalid limit',
+      })
+    }
+
+    const { products, total } = await getAllProducts(filters, {
+      page,
+      limit,
+    })
+
+    res.status(200).json({
+      products,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+      },
+    })
   } catch (error) {
     next(error)
   }
