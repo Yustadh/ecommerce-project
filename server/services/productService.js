@@ -7,7 +7,7 @@ export const getAllProducts = async (
   const skip = (page - 1) * limit
 
   const [products, total] = await Promise.all([
-    Product.find(filters).skip(skip).limit(limit),
+    Product.find(filters).sort({ createdAt: -1, _id: -1 }).skip(skip).limit(limit),
     Product.countDocuments(filters),
   ])
 

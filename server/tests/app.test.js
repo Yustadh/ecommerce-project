@@ -107,6 +107,36 @@ describe('Product API', () => {
     )
   })
 
+  test('GET /api/products should return newest products first', async () => {
+    const firstResponse = await request(app).post('/api/products').send({
+      name: 'Older Product',
+      price: 100,
+      category: 'Sorting',
+      stock: 10,
+    })
+
+    const secondResponse = await request(app).post('/api/products').send({
+      name: 'Newer Product',
+      price: 200,
+      category: 'Sorting',
+      stock: 10,
+    })
+
+    expect(firstResponse.statusCode).toBe(201)
+    expect(secondResponse.statusCode).toBe(201)
+
+    const response = await request(app)
+      .get('/api/products')
+      .query({
+        category: 'Sorting',
+        limit: 10,
+      })
+      .expect(200)
+
+    expect(response.body.products[0].name).toBe('Newer Product')
+    expect(response.body.products[1].name).toBe('Older Product')
+  })
+
   test('GET /api/products?page should reject an invalid page', async () => {
     const response = await request(app)
       .get('/api/products')
