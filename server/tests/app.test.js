@@ -346,6 +346,47 @@ describe('Product API', () => {
     expect(response.body.message).toBe('Invalid sort order')
   })
 
+  test('GET /api/products?fields should return only requested fields', async () => {
+    await request(app).post('/api/products').send({
+      name: 'Field Selection Product',
+      price: 500,
+      category: 'FieldSelection',
+      stock: 15,
+    })
+
+    const response = await request(app)
+      .get('/api/products')
+      .query({
+        category: 'FieldSelection',
+        fields: 'name,price',
+      })
+      .expect(200)
+
+    expect(response.body.products).toHaveLength(1)
+    expect(response.body.products[0].name).toBe('Field Selection Product')
+    expect(response.body.products[0].price).toBe(500)
+    expect(response.body.products[0].category).toBeUndefined()
+    expect(response.body.products[0].stock).toBeUndefined()
+  })
+
+  test('GET /api/products?fields should reject unknown fields', async () => {
+    const response = await request(app)
+      .get('/api/products')
+      .query({ fields: 'name,password' })
+      .expect(400)
+
+    expect(response.body.message).toBe('Invalid fields')
+  })
+
+  test('GET /api/products?fields should reject an empty field selection', async () => {
+    const response = await request(app)
+      .get('/api/products')
+      .query({ fields: '' })
+      .expect(400)
+
+    expect(response.body.message).toBe('Invalid fields')
+  })
+
   test('POST /api/products should create a new product', async () => {
     const newProduct = {
       name: 'Test Product',

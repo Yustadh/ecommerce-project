@@ -1,3 +1,4 @@
+import { parseProductFields } from '../utils/productQuery.js'
 import {
   getAllProducts,
   getProductById,
@@ -100,10 +101,13 @@ export const getProducts = async (req, res, next) => {
       _id: -1,
     }
 
+    const fields = parseProductFields(req.query.fields)
+
     const { products, total } = await getAllProducts(filters, {
       page,
       limit,
       sort,
+      fields,
     })
 
     res.status(200).json({
