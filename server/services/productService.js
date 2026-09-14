@@ -2,15 +2,12 @@ import Product from '../models/productModel.js'
 
 export const getAllProducts = async (
   filters = {},
-  { page = 1, limit = 10 } = {},
+  { page = 1, limit = 10, sort = { createdAt: -1, _id: -1 } } = {},
 ) => {
   const skip = (page - 1) * limit
 
   const [products, total] = await Promise.all([
-    Product.find(filters)
-      .sort({ createdAt: -1, _id: -1 })
-      .skip(skip)
-      .limit(limit),
+    Product.find(filters).sort(sort).skip(skip).limit(limit),
     Product.countDocuments(filters),
   ])
 

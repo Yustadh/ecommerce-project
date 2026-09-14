@@ -7,6 +7,9 @@ import {
   deleteProductById,
 } from '../services/productService.js'
 
+const allowedSortFields = ['createdAt', 'name', 'price', 'stock']
+const allowedSortOrders = ['asc', 'desc']
+
 export const getProducts = async (req, res, next) => {
   try {
     const filters = {}
@@ -77,9 +80,30 @@ export const getProducts = async (req, res, next) => {
       })
     }
 
+    const sortField = req.query.sort ?? 'createdAt'
+    const sortOrder = req.query.order ?? 'desc'
+
+    if (!allowedSortFields.includes(sortField)) {
+      return res.status(400).json({
+        message: 'Invalid sort field',
+      })
+    }
+
+    if (!allowedSortOrders.includes(sortOrder)) {
+      return res.status(400).json({
+        message: 'Invalid sort order',
+      })
+    }
+
+    const sort = {
+      [sortField]: sortOrder === 'asc' ? 1 : -1,
+      _id: -1,
+    }
+
     const { products, total } = await getAllProducts(filters, {
       page,
       limit,
+      sort,
     })
 
     res.status(200).json({

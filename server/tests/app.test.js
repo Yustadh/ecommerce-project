@@ -280,6 +280,72 @@ describe('Product API', () => {
     expect(response.body.products[0].name).toBe('Samsung Galaxy Phone')
   })
 
+  test('GET /api/products?sort=price&order=asc should sort products by price ascending', async () => {
+    await request(app).post('/api/products').send({
+      name: 'Expensive Product',
+      price: 900,
+      category: 'sortingTest',
+      stock: 10,
+    })
+
+    await request(app).post('/api/products').send({
+      name: 'Cheap Product',
+      price: 100,
+      category: 'sortingTest',
+      stock: 10,
+    })
+
+    const response = await request(app)
+      .get('/api/products')
+      .query({ category: 'sortingTest', sort: 'price', order: 'asc' })
+      .expect(200)
+
+    expect(response.body.products.map((product) => product.price)).toEqual([
+      100, 900,
+    ])
+  })
+
+  test('GET /api/products?sort=price&order=desc should sort products by price descending', async () => {
+    await request(app).post('/api/products').send({
+      name: 'Cheap Product',
+      price: 100,
+      category: 'sortingTestDesc',
+      stock: 10,
+    })
+
+    await request(app).post('/api/products').send({
+      name: 'Expensive ProductDesc',
+      price: 900,
+      category: 'sortingTestDesc',
+      stock: 10,
+    })
+
+    const response = await request(app)
+      .get('/api/products')
+      .query({ category: 'sortingTestDesc', sort: 'price', order: 'desc' })
+      .expect(200)
+
+    expect(response.body.products.map((product) => product.price)).toEqual([
+      900, 100,
+    ])
+  })
+  test('GET /api/products?sort should reject an invalid sort field', async () => {
+    const response = await request(app)
+      .get('/api/products')
+      .query({ sort: 'password' })
+      .expect(400)
+
+    expect(response.body.message).toBe('Invalid sort field')
+  })
+  test('GET /api/products?order should reject an invalid sort order', async () => {
+    const response = await request(app)
+      .get('/api/products')
+      .query({ sort: 'price', order: 'random' })
+      .expect(400)
+
+    expect(response.body.message).toBe('Invalid sort order')
+  })
+
   test('POST /api/products should create a new product', async () => {
     const newProduct = {
       name: 'Test Product',
