@@ -255,6 +255,31 @@ describe('Product API', () => {
       'minPrice cannot be greater than maxPrice',
     )
   })
+
+  test('GET /api/products?search should return matching products case-insensitively', async () => {
+    await request(app).post('/api/products').send({
+      name: 'Samsung Galaxy Phone',
+      price: 800,
+      category: 'Electronics',
+      stock: 10,
+    })
+
+    await request(app).post('/api/products').send({
+      name: 'Wireless Keyboard',
+      price: 100,
+      category: 'Electronics',
+      stock: 10,
+    })
+
+    const response = await request(app)
+      .get('/api/products')
+      .query({ search: 'samsung' })
+      .expect(200)
+
+    expect(response.body.products).toHaveLength(1)
+    expect(response.body.products[0].name).toBe('Samsung Galaxy Phone')
+  })
+
   test('POST /api/products should create a new product', async () => {
     const newProduct = {
       name: 'Test Product',

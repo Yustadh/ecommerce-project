@@ -15,6 +15,13 @@ export const getProducts = async (req, res, next) => {
       filters.category = req.query.category
     }
 
+    if (req.query.search) {
+      filters.name = {
+        $regex: req.query.search,
+        $options: 'i',
+      }
+    }
+
     if (req.query.minPrice !== undefined) {
       const minPrice = Number(req.query.minPrice)
 
