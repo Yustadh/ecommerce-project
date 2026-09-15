@@ -1,4 +1,5 @@
 import { parseProductFields } from '../utils/productQuery.js'
+import { parsePagination } from '../utils/pagination.js'
 import {
   getAllProducts,
   getProductById,
@@ -66,20 +67,7 @@ export const getProducts = async (req, res, next) => {
       })
     }
 
-    const page = Number(req.query.page ?? 1)
-    const limit = Number(req.query.limit ?? 10)
-
-    if (!Number.isInteger(page) || page < 1) {
-      return res.status(400).json({
-        message: 'Invalid page',
-      })
-    }
-
-    if (!Number.isInteger(limit) || limit < 1 || limit > 100) {
-      return res.status(400).json({
-        message: 'Invalid limit',
-      })
-    }
+    const { page, limit } = parsePagination(req.query.page, req.query.limit)
 
     const sortField = req.query.sort ?? 'createdAt'
     const sortOrder = req.query.order ?? 'desc'
