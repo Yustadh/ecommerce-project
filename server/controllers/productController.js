@@ -1,5 +1,6 @@
 import { parseProductFields } from '../utils/productQuery.js'
 import { parsePagination } from '../utils/pagination.js'
+import { parseSort } from '../utils/sorting.js'
 import {
   getAllProducts,
   getProductById,
@@ -8,9 +9,6 @@ import {
   patchProductById,
   deleteProductById,
 } from '../services/productService.js'
-
-const allowedSortFields = ['createdAt', 'name', 'price', 'stock']
-const allowedSortOrders = ['asc', 'desc']
 
 export const getProducts = async (req, res, next) => {
   try {
@@ -69,25 +67,7 @@ export const getProducts = async (req, res, next) => {
 
     const { page, limit } = parsePagination(req.query.page, req.query.limit)
 
-    const sortField = req.query.sort ?? 'createdAt'
-    const sortOrder = req.query.order ?? 'desc'
-
-    if (!allowedSortFields.includes(sortField)) {
-      return res.status(400).json({
-        message: 'Invalid sort field',
-      })
-    }
-
-    if (!allowedSortOrders.includes(sortOrder)) {
-      return res.status(400).json({
-        message: 'Invalid sort order',
-      })
-    }
-
-    const sort = {
-      [sortField]: sortOrder === 'asc' ? 1 : -1,
-      _id: -1,
-    }
+    const sort = parseSort(req.query.sort, req.query.order)
 
     const fields = parseProductFields(req.query.fields)
 
