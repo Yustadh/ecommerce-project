@@ -233,6 +233,96 @@ describe('Product API', () => {
     ).toBe(true)
   })
 
+  test('GET /api/products should combine category and price filters', async () => {
+    await request(app).post('/api/products').send({
+      name: 'Electronics Cheap',
+      price: 50,
+      category: 'CombinedFilter',
+      stock: 10,
+    })
+
+    await request(app).post('/api/products').send({
+      name: 'Electronics Midrange',
+      price: 300,
+      category: 'CombinedFilter',
+      stock: 10,
+    })
+
+    await request(app).post('/api/products').send({
+      name: 'Fashion Midrange',
+      price: 300,
+      category: 'Fashion',
+      stock: 10,
+    })
+
+    await request(app).post('/api/products').send({
+      name: 'Electronics Expensive',
+      price: 800,
+      category: 'CombinedFilter',
+      stock: 10,
+    })
+
+    const response = await request(app)
+      .get('/api/products')
+      .query({
+        category: 'CombinedFilter',
+        minPrice: 100,
+        maxPrice: 500,
+      })
+      .expect(200)
+
+    expect(response.body.products).toHaveLength(1)
+    expect(response.body.products[0]).toEqual(
+      expect.objectContaining({
+        name: 'Electronics Midrange',
+        price: 300,
+        category: 'CombinedFilter',
+      }),
+    )
+  })
+  test('GET /api/products should combine search and sorting', async () => {
+    await request(app).post('/api/products').send({
+      name: 'Samsung Galaxy A',
+      price: 800,
+      category: 'SearchSort',
+      stock: 10,
+    })
+
+    await request(app).post('/api/products').send({
+      name: 'Samsung Galaxy B',
+      price: 500,
+      category: 'SearchSort',
+      stock: 10,
+    })
+
+    await request(app).post('/api/products').send({
+      name: 'Wireless Keyboard',
+      price: 100,
+      category: 'SearchSort',
+      stock: 10,
+    })
+
+    const response = await request(app)
+      .get('/api/products')
+      .query({
+        search: 'samsung',
+        sort: 'price',
+        order: 'asc',
+      })
+      .expect(200)
+
+    expect(response.body.products).toHaveLength(2)
+
+    expect(response.body.products.map((product) => product.name)).toEqual([
+      'Samsung Galaxy B',
+      'Samsung Galaxy A',
+    ])
+
+    expect(response.body.products.map((product) => product.price)).toEqual([
+      500, 800,
+    ])
+  })
+
   test('GET /api/products?minPrice should reject an invalid minimum price', async () => {
     const response = await request(app)
       .get('/api/products')
