@@ -15,6 +15,24 @@ describe('parseProductFilters', () => {
     })
   })
 
+  test('should trim whitespace from category', () => {
+    expect(
+      parseProductFilters({
+        category: '  Electronics  ',
+      }),
+    ).toEqual({
+      category: 'Electronics',
+    })
+  })
+
+  test('should ignore whitespace-only category', () => {
+    expect(
+      parseProductFilters({
+        category: '   ',
+      }),
+    ).toEqual({})
+  })
+
   test('should filter by search term case-insensitively', () => {
     expect(
       parseProductFilters({

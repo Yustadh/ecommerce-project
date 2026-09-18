@@ -6,7 +6,11 @@ export const parseProductFilters = (query = {}) => {
   const filters = {}
 
   if (query.category) {
-    filters.category = query.category
+    const category = query.category.trim()
+
+    if (category) {
+      filters.category = category
+    }
   }
 
   if (query.search) {
