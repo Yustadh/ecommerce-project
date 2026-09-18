@@ -423,6 +423,14 @@ describe('Product API', () => {
     expect(response.body.message).toBe('Invalid minPrice')
   })
 
+  test('GET /api/products?category should reject a non-string category', async () => {
+    const response = await request(app)
+      .get('/api/products?category=Electronics&category=Books')
+      .expect(400)
+
+    expect(response.body.message).toBe('Invalid category')
+  })
+
   test('GET /api/products should reject a minimum price greater than maximum price', async () => {
     const response = await request(app)
       .get('/api/products')

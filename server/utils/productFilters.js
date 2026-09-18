@@ -5,7 +5,13 @@ const escapeRegex = (value) => {
 export const parseProductFilters = (query = {}) => {
   const filters = {}
 
-  if (query.category) {
+  if (query.category !== undefined) {
+    if (typeof query.category !== 'string') {
+      const error = new Error('Invalid category')
+      error.statusCode = 400
+      throw error
+    }
+
     const category = query.category.trim()
 
     if (category) {

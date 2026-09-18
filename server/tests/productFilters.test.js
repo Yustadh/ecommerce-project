@@ -33,6 +33,25 @@ describe('parseProductFilters', () => {
     ).toEqual({})
   })
 
+  test('should reject a non-string category', () => {
+    expect(() =>
+      parseProductFilters({
+        category: ['Electronics'],
+      }),
+    ).toThrow('Invalid category')
+  })
+
+  test('should assign a 400 status code to invalid category errors', () => {
+    try {
+      parseProductFilters({
+        category: ['Electronics'],
+      })
+    } catch (error) {
+      expect(error.message).toBe('Invalid category')
+      expect(error.statusCode).toBe(400)
+    }
+  })
+
   test('should filter by search term case-insensitively', () => {
     expect(
       parseProductFilters({
