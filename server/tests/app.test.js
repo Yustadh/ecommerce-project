@@ -107,6 +107,97 @@ describe('Product API', () => {
     )
   })
 
+  test('GET /api/products?page beyond available pages should return an empty product list', async () => {
+    await request(app).post('/api/products').send({
+      name: 'Page Boundary Product 1',
+      price: 100,
+      category: 'PaginationBoundary',
+      stock: 10,
+    })
+
+    await request(app).post('/api/products').send({
+      name: 'Page Boundary Product 2',
+      price: 200,
+      category: 'PaginationBoundary',
+      stock: 10,
+    })
+
+    await request(app).post('/api/products').send({
+      name: 'Page Boundary Product 3',
+      price: 300,
+      category: 'PaginationBoundary',
+      stock: 10,
+    })
+
+    const response = await request(app)
+      .get('/api/products')
+      .query({
+        category: 'PaginationBoundary',
+        page: 3,
+        limit: 2,
+      })
+      .expect(200)
+
+    expect(response.body.products).toEqual([])
+    expect(response.body.pagination).toEqual(
+      expect.objectContaining({
+        page: 3,
+        limit: 2,
+        total: 3,
+        totalPages: 2,
+      }),
+    )
+  })
+
+  test('GET /api/products should calculate total pages correctly when total is divisible by limit', async () => {
+    await request(app).post('/api/products').send({
+      name: 'Exact Page Product 1',
+      price: 100,
+      category: 'PaginationExact',
+      stock: 10,
+    })
+
+    await request(app).post('/api/products').send({
+      name: 'Exact Page Product 2',
+      price: 200,
+      category: 'PaginationExact',
+      stock: 10,
+    })
+
+    await request(app).post('/api/products').send({
+      name: 'Exact Page Product 3',
+      price: 300,
+      category: 'PaginationExact',
+      stock: 10,
+    })
+
+    await request(app).post('/api/products').send({
+      name: 'Exact Page Product 4',
+      price: 400,
+      category: 'PaginationExact',
+      stock: 10,
+    })
+
+    const response = await request(app)
+      .get('/api/products')
+      .query({
+        category: 'PaginationExact',
+        page: 2,
+        limit: 2,
+      })
+      .expect(200)
+
+    expect(response.body.products).toHaveLength(2)
+    expect(response.body.pagination).toEqual(
+      expect.objectContaining({
+        page: 2,
+        limit: 2,
+        total: 4,
+        totalPages: 2,
+      }),
+    )
+  })
+
   test('GET /api/products should return newest products first', async () => {
     const firstResponse = await request(app).post('/api/products').send({
       name: 'Older Product',
