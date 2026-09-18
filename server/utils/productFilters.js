@@ -1,3 +1,7 @@
+const escapeRegex = (value) => {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
+
 export const parseProductFilters = (query = {}) => {
   const filters = {}
 
@@ -7,7 +11,7 @@ export const parseProductFilters = (query = {}) => {
 
   if (query.search) {
     filters.name = {
-      $regex: query.search,
+      $regex: escapeRegex(query.search),
       $options: 'i',
     }
   }

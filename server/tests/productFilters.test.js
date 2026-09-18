@@ -28,6 +28,19 @@ describe('parseProductFilters', () => {
     })
   })
 
+  test('should treat regex special characters as literal search text', () => {
+    expect(
+      parseProductFilters({
+        search: 'C++',
+      }),
+    ).toEqual({
+      name: {
+        $regex: 'C\\+\\+',
+        $options: 'i',
+      },
+    })
+  })
+
   test('should filter by minimum price', () => {
     expect(
       parseProductFilters({
