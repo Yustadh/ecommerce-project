@@ -40,6 +40,26 @@ describe('parseProductFilters', () => {
       },
     })
   })
+  test('should trim whitespace from search terms', () => {
+    expect(
+      parseProductFilters({
+        search: '  samsung  ',
+      }),
+    ).toEqual({
+      name: {
+        $regex: 'samsung',
+        $options: 'i',
+      },
+    })
+  })
+
+  test('should ignore whitespace-only search terms', () => {
+    expect(
+      parseProductFilters({
+        search: '   ',
+      }),
+    ).toEqual({})
+  })
 
   test('should filter by minimum price', () => {
     expect(

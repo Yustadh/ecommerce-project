@@ -10,9 +10,13 @@ export const parseProductFilters = (query = {}) => {
   }
 
   if (query.search) {
-    filters.name = {
-      $regex: escapeRegex(query.search),
-      $options: 'i',
+    const search = query.search.trim()
+
+    if (search) {
+      filters.name = {
+        $regex: escapeRegex(search),
+        $options: 'i',
+      }
     }
   }
 
