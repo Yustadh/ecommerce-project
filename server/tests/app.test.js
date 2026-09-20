@@ -431,6 +431,14 @@ describe('Product API', () => {
     expect(response.body.message).toBe('Invalid category')
   })
 
+  test('should reject a malformed search query', async () => {
+    const response = await request(app)
+      .get('/api/products?search=phone&search=tablet')
+      .expect(400)
+
+    expect(response.body.message).toBe('Invalid search')
+  })
+
   test('GET /api/products should reject a minimum price greater than maximum price', async () => {
     const response = await request(app)
       .get('/api/products')

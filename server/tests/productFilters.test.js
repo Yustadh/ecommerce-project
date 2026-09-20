@@ -98,6 +98,25 @@ describe('parseProductFilters', () => {
     ).toEqual({})
   })
 
+  test('should reject a non-string search value', () => {
+    expect(() =>
+      parseProductFilters({
+        search: ['phone'],
+      }),
+    ).toThrow('Invalid search')
+  })
+
+  test('should assign a 400 status code to invalid search errors', () => {
+    try {
+      parseProductFilters({
+        search: ['phone'],
+      })
+    } catch (error) {
+      expect(error.message).toBe('Invalid search')
+      expect(error.statusCode).toBe(400)
+    }
+  })
+
   test('should filter by minimum price', () => {
     expect(
       parseProductFilters({

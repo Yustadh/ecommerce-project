@@ -19,7 +19,13 @@ export const parseProductFilters = (query = {}) => {
     }
   }
 
-  if (query.search) {
+  if (query.search !== undefined) {
+    if (typeof query.search !== 'string') {
+      const error = new Error('Invalid search')
+      error.statusCode = 400
+      throw error
+    }
+
     const search = query.search.trim()
 
     if (search) {
