@@ -236,6 +236,19 @@ describe('Product API', () => {
 
     expect(response.body.message).toBe('Invalid page')
   })
+  test('GET /api/products with no matching filters should return empty results and zero total pages', async () => {
+    const response = await request(app)
+      .get('/api/products?category=NonexistentCategory')
+      .expect(200)
+
+    expect(response.body.products).toEqual([])
+    expect(response.body.pagination).toEqual({
+      page: 1,
+      limit: 10,
+      total: 0,
+      totalPages: 0,
+    })
+  })
 
   test('GET /api/products?limit should reject an invalid limit', async () => {
     const response = await request(app)
