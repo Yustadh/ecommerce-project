@@ -129,6 +129,30 @@ describe('parseProductFilters', () => {
     })
   })
 
+  test('should accept a minimum price of zero', () => {
+    expect(
+      parseProductFilters({
+        minPrice: '0',
+      }),
+    ).toEqual({
+      price: {
+        $gte: 0,
+      },
+    })
+  })
+
+  test('should accept a maximum price of zero', () => {
+    expect(
+      parseProductFilters({
+        maxPrice: '0',
+      }),
+    ).toEqual({
+      price: {
+        $lte: 0,
+      },
+    })
+  })
+
   test('should filter by maximum price', () => {
     expect(
       parseProductFilters({
