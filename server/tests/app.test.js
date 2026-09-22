@@ -258,6 +258,41 @@ describe('Product API', () => {
     expect(response.body.message).toBe('Invalid limit')
   })
 
+  test('GET /api/products should return the remaining products on the final partial page', async () => {
+    await request(app).post('/api/products').send({
+      name: 'Product 1',
+      price: 10,
+      category: 'Electronics',
+      stock: 5,
+    })
+
+    await request(app).post('/api/products').send({
+      name: 'Product 2',
+      price: 20,
+      category: 'Electronics',
+      stock: 5,
+    })
+
+    await request(app).post('/api/products').send({
+      name: 'Product 3',
+      price: 30,
+      category: 'Electronics',
+      stock: 5,
+    })
+
+    const response = await request(app)
+      .get('/api/products?page=2&limit=2')
+      .expect(200)
+
+    expect(response.body.products).toHaveLength(1)
+    expect(response.body.pagination).toEqual({
+      page: 2,
+      limit: 2,
+      total: 3,
+      totalPages: 2,
+    })
+  })
+
   test('GET /api/products?limit should reject an invalid limit', async () => {
     const response = await request(app)
       .get('/api/products')
