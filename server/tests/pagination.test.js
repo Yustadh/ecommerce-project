@@ -22,6 +22,26 @@ describe('parsePagination', () => {
     })
   })
 
+  test('should accept the maximum limit of 100', () => {
+    expect(parsePagination('1', '100')).toEqual({
+      page: 1,
+      limit: 100,
+    })
+  })
+
+  test('should reject a limit greater than 100', () => {
+    expect(() => parsePagination('1', '101')).toThrow('Invalid limit')
+  })
+
+  test('should assign a 400 status code when limit is greater than 100', () => {
+    try {
+      parsePagination('1', '101')
+    } catch (error) {
+      expect(error.message).toBe('Invalid limit')
+      expect(error.statusCode).toBe(400)
+    }
+  })
+
   test('should reject an invalid page', () => {
     expect(() => parsePagination('abc', '10')).toThrow('Invalid page')
   })

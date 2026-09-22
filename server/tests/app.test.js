@@ -250,6 +250,14 @@ describe('Product API', () => {
     })
   })
 
+  test('GET /api/products?limit=101 should reject a limit above the maximum', async () => {
+    const response = await request(app)
+      .get('/api/products?limit=101')
+      .expect(400)
+
+    expect(response.body.message).toBe('Invalid limit')
+  })
+
   test('GET /api/products?limit should reject an invalid limit', async () => {
     const response = await request(app)
       .get('/api/products')
