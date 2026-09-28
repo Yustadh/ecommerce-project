@@ -11,6 +11,7 @@ jest.unstable_mockModule('../models/userModel.js', () => ({
 
 jest.unstable_mockModule('../utils/password.js', () => ({
   hashPassword: mockHashPassword,
+  verifyPassword: jest.fn(),
 }))
 
 const { registerUser } = await import('../services/authService.js')

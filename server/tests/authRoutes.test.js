@@ -6,6 +6,7 @@ const mockRegister = jest.fn()
 
 jest.unstable_mockModule('../controllers/authController.js', () => ({
   register: mockRegister,
+  login: jest.fn(),
 }))
 
 const { default: authRouter } = await import('../routes/authRoutes.js')
