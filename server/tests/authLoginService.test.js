@@ -2,6 +2,7 @@ import { jest } from '@jest/globals'
 
 const mockUserFindOne = jest.fn()
 const mockVerifyPassword = jest.fn()
+const mockGenerateToken = jest.fn()
 
 jest.unstable_mockModule('../models/userModel.js', () => ({
   default: {
@@ -14,6 +15,9 @@ jest.unstable_mockModule('../utils/password.js', () => ({
   verifyPassword: mockVerifyPassword,
 }))
 
+jest.unstable_mockModule('../utils/token.js', () => ({
+  generateToken: mockGenerateToken,
+}))
 const { loginUser } = await import('../services/authService.js')
 
 describe('Auth login service', () => {
@@ -35,6 +39,7 @@ describe('Auth login service', () => {
     })
 
     mockVerifyPassword.mockResolvedValue(true)
+    mockGenerateToken.mockReturnValue('test-token')
 
     const result = await loginUser({
       email: 'john@example.com',
@@ -51,11 +56,15 @@ describe('Auth login service', () => {
     )
 
     expect(result).toEqual({
-      id: 'user-id',
-      name: 'John Doe',
-      email: 'john@example.com',
-      role: 'customer',
+      token: 'test-token',
+      user: {
+        id: 'user-id',
+        name: 'John Doe',
+        email: 'john@example.com',
+        role: 'customer',
+      },
     })
+    expect(mockGenerateToken).toHaveBeenCalledWith(user)
   })
 
   test('should explicitly select the password hash', async () => {

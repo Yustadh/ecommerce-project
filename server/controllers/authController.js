@@ -15,10 +15,11 @@ export const register = async (req, res, next) => {
 
 export const login = async (req, res, next) => {
   try {
-    const user = await loginUser(req.body)
+    const { token, user } = await loginUser(req.body)
 
     return res.status(200).json({
       message: 'Login successful',
+      token,
       user,
     })
   } catch (error) {

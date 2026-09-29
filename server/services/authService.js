@@ -1,5 +1,6 @@
 import User from '../models/userModel.js'
 import { hashPassword, verifyPassword } from '../utils/password.js'
+import { generateToken } from '../utils/token.js'
 
 export const registerUser = async ({ name, email, password }) => {
   const hashedPassword = await hashPassword(password)
@@ -36,10 +37,15 @@ export const loginUser = async ({ email, password }) => {
     throw error
   }
 
+  const token = generateToken(user)
+
   return {
-    id: user._id,
-    name: user.name,
-    email: user.email,
-    role: user.role,
+    token,
+    user: {
+      id: user._id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+    },
   }
 }

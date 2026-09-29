@@ -1,4 +1,5 @@
 import request from 'supertest'
+import jwt from 'jsonwebtoken'
 import User from '../models/userModel.js'
 import app from '../app.js'
 import { hashPassword } from '../utils/password.js'
@@ -25,6 +26,7 @@ describe('Login API integration', () => {
 
     expect(response.body).toEqual({
       message: 'Login successful',
+      token: expect.any(String),
       user: {
         id: expect.anything(),
         name: 'John Doe',
@@ -32,6 +34,11 @@ describe('Login API integration', () => {
         role: 'customer',
       },
     })
+
+    const decodedToken = jwt.verify(response.body.token, process.env.JWT_SECRET)
+
+    expect(decodedToken.sub).toBe(response.body.user.id)
+    expect(decodedToken.role).toBe('customer')
 
     expect(response.body.user.password).toBeUndefined()
   })

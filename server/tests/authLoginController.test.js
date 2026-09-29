@@ -30,10 +30,13 @@ describe('Auth login controller', () => {
     const res = createResponse()
 
     mockLoginUser.mockResolvedValue({
-      id: 'user-id',
-      name: 'John Doe',
-      email: 'john@example.com',
-      role: 'customer',
+      token: 'test-token',
+      user: {
+        id: 'user-id',
+        name: 'John Doe',
+        email: 'john@example.com',
+        role: 'customer',
+      },
     })
 
     await login(req, res)
@@ -44,6 +47,7 @@ describe('Auth login controller', () => {
 
     expect(res.json).toHaveBeenCalledWith({
       message: 'Login successful',
+      token: 'test-token',
       user: {
         id: 'user-id',
         name: 'John Doe',
