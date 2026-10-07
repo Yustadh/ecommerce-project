@@ -26,3 +26,12 @@ export const login = async (req, res, next) => {
     next(error)
   }
 }
+
+export const getCurrentUser = (req, res) => {
+  return res.status(200).json({
+    user: {
+      id: req.user.id,
+      role: req.user.role,
+    },
+  })
+}

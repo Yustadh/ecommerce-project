@@ -3,10 +3,12 @@ import request from 'supertest'
 import { jest } from '@jest/globals'
 
 const mockRegister = jest.fn()
+const mockGetCurrentUser = jest.fn()
 
 jest.unstable_mockModule('../controllers/authController.js', () => ({
   register: mockRegister,
   login: jest.fn(),
+  getCurrentUser: mockGetCurrentUser,
 }))
 
 const { default: authRouter } = await import('../routes/authRoutes.js')

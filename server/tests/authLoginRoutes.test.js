@@ -4,10 +4,12 @@ import { jest } from '@jest/globals'
 
 const mockRegister = jest.fn()
 const mockLogin = jest.fn()
+const mockGetCurrentUser = jest.fn()
 
 jest.unstable_mockModule('../controllers/authController.js', () => ({
   register: mockRegister,
   login: mockLogin,
+  getCurrentUser: mockGetCurrentUser,
 }))
 
 const { default: authRouter } = await import('../routes/authRoutes.js')
