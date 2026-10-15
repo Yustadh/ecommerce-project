@@ -25,7 +25,13 @@ router.post(
   validateProduct,
   createProductController,
 )
-router.put('/:id', validateProduct, updateProduct)
+router.put(
+  '/:id',
+  authenticate,
+  authorize('admin'),
+  validateProduct,
+  updateProduct,
+)
 router.patch('/:id', validateUpdateProduct, patchProduct)
 router.delete('/:id', deleteProduct)
 

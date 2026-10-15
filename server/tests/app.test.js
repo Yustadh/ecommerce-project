@@ -887,6 +887,41 @@ describe('Product API', () => {
     expect(response.statusCode).toBe(400)
     expect(response.body.message).toBe('Invalid product ID')
   })
+
+  test('PUT /api/products/:id should reject requests without a token', async () => {
+    const response = await request(app)
+      .put('/api/products/507f1f77bcf86cd799439011')
+      .send({
+        name: 'Updated Product',
+        price: 150,
+        category: 'Electronics',
+        stock: 20,
+      })
+
+    expect(response.statusCode).toBe(401)
+    expect(response.body.message).toBe('Authentication required')
+  })
+
+  test('PUT /api/products/:id should reject customers', async () => {
+    const customerToken = createAuthToken({
+      id: 'test-customer-id',
+      role: 'customer',
+    })
+
+    const response = await request(app)
+      .put('/api/products/507f1f77bcf86cd799439011')
+      .set('Authorization', `Bearer ${customerToken}`)
+      .send({
+        name: 'Updated Product',
+        price: 150,
+        category: 'Electronics',
+        stock: 20,
+      })
+
+    expect(response.statusCode).toBe(403)
+    expect(response.body.message).toBe('Access denied')
+  })
+
   test('PUT /api/products/:id should update an existing product', async () => {
     const newProduct = {
       name: 'Product Before Update',
@@ -913,6 +948,7 @@ describe('Product API', () => {
 
     const response = await request(app)
       .put(`/api/products/${productId}`)
+      .set('Authorization', `Bearer ${adminToken}`)
       .send(updatedProduct)
 
     expect(response.statusCode).toBe(200)
@@ -948,6 +984,7 @@ describe('Product API', () => {
 
     const response = await request(app)
       .put(`/api/products/${productId}`)
+      .set('Authorization', `Bearer ${adminToken}`)
       .send(invalidProduct)
 
     expect(response.statusCode).toBe(400)
