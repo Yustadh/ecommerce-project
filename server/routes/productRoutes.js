@@ -32,7 +32,13 @@ router.put(
   validateProduct,
   updateProduct,
 )
-router.patch('/:id', validateUpdateProduct, patchProduct)
+router.patch(
+  '/:id',
+  authenticate,
+  authorize('admin'),
+  validateUpdateProduct,
+  patchProduct,
+)
 router.delete('/:id', deleteProduct)
 
 export default router

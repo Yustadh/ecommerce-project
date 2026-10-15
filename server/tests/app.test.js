@@ -998,6 +998,35 @@ describe('Product API', () => {
       ]),
     )
   })
+
+  test('PATCH /api/products/:id should reject requests without a token', async () => {
+    const response = await request(app)
+      .patch('/api/products/507f1f77bcf86cd799439011')
+      .send({
+        price: 250,
+      })
+
+    expect(response.statusCode).toBe(401)
+    expect(response.body.message).toBe('Authentication required')
+  })
+
+  test('PATCH /api/products/:id should reject customers', async () => {
+    const customerToken = createAuthToken({
+      id: 'test-customer-id',
+      role: 'customer',
+    })
+
+    const response = await request(app)
+      .patch('/api/products/507f1f77bcf86cd799439011')
+      .set('Authorization', `Bearer ${customerToken}`)
+      .send({
+        price: 250,
+      })
+
+    expect(response.statusCode).toBe(403)
+    expect(response.body.message).toBe('Access denied')
+  })
+
   test('PATCH /api/products/:id should partially update an existing product', async () => {
     const newProduct = {
       name: 'PATCH Test Product',
@@ -1017,6 +1046,7 @@ describe('Product API', () => {
 
     const response = await request(app)
       .patch(`/api/products/${productId}`)
+      .set('Authorization', `Bearer ${adminToken}`)
       .send({
         price: 250,
         stock: 25,
@@ -1048,6 +1078,7 @@ describe('Product API', () => {
 
     const response = await request(app)
       .patch(`/api/products/${productId}`)
+      .set('Authorization', `Bearer ${adminToken}`)
       .send({})
 
     expect(response.statusCode).toBe(400)
@@ -1075,6 +1106,7 @@ describe('Product API', () => {
 
     const response = await request(app)
       .patch(`/api/products/${productId}`)
+      .set('Authorization', `Bearer ${adminToken}`)
       .send({
         discount: 20,
       })
