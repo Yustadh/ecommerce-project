@@ -1,5 +1,6 @@
 import request from 'supertest'
 import app from '../app.js'
+import { createAuthToken } from './helpers/authTestUtils.js'
 
 describe('API health check', () => {
   test('GET /api/health should return API is healthy', async () => {
@@ -11,6 +12,11 @@ describe('API health check', () => {
 })
 
 describe('Product API', () => {
+  const adminToken = createAuthToken({
+    id: 'test-admin-id',
+    role: 'admin',
+  })
+
   test('GET /api/products should return paginated products', async () => {
     const response = await request(app).get('/api/products')
 
@@ -24,26 +30,35 @@ describe('Product API', () => {
     )
   })
   test('GET /api/products?page=1&limit=2 should return the requested number of products', async () => {
-    await request(app).post('/api/products').send({
-      name: 'Pagination Product 1',
-      price: 100,
-      category: 'PaginationPage1',
-      stock: 10,
-    })
+    await request(app)
+      .post('/api/products')
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({
+        name: 'Pagination Product 1',
+        price: 100,
+        category: 'PaginationPage1',
+        stock: 10,
+      })
 
-    await request(app).post('/api/products').send({
-      name: 'Pagination Product 2',
-      price: 200,
-      category: 'PaginationPage1',
-      stock: 10,
-    })
+    await request(app)
+      .post('/api/products')
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({
+        name: 'Pagination Product 2',
+        price: 200,
+        category: 'PaginationPage1',
+        stock: 10,
+      })
 
-    await request(app).post('/api/products').send({
-      name: 'Pagination Product 3',
-      price: 300,
-      category: 'PaginationPage1',
-      stock: 10,
-    })
+    await request(app)
+      .post('/api/products')
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({
+        name: 'Pagination Product 3',
+        price: 300,
+        category: 'PaginationPage1',
+        stock: 10,
+      })
 
     const response = await request(app)
       .get('/api/products')
@@ -66,26 +81,35 @@ describe('Product API', () => {
   })
 
   test('GET /api/products?page=2&limit=2 should return the second page', async () => {
-    await request(app).post('/api/products').send({
-      name: 'Page Product 1',
-      price: 100,
-      category: 'PaginationPage2',
-      stock: 10,
-    })
+    await request(app)
+      .post('/api/products')
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({
+        name: 'Page Product 1',
+        price: 100,
+        category: 'PaginationPage2',
+        stock: 10,
+      })
 
-    await request(app).post('/api/products').send({
-      name: 'Page Product 2',
-      price: 200,
-      category: 'PaginationPage2',
-      stock: 10,
-    })
+    await request(app)
+      .post('/api/products')
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({
+        name: 'Page Product 2',
+        price: 200,
+        category: 'PaginationPage2',
+        stock: 10,
+      })
 
-    await request(app).post('/api/products').send({
-      name: 'Page Product 3',
-      price: 300,
-      category: 'PaginationPage2',
-      stock: 10,
-    })
+    await request(app)
+      .post('/api/products')
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({
+        name: 'Page Product 3',
+        price: 300,
+        category: 'PaginationPage2',
+        stock: 10,
+      })
 
     const response = await request(app)
       .get('/api/products')
@@ -108,26 +132,35 @@ describe('Product API', () => {
   })
 
   test('GET /api/products?page beyond available pages should return an empty product list', async () => {
-    await request(app).post('/api/products').send({
-      name: 'Page Boundary Product 1',
-      price: 100,
-      category: 'PaginationBoundary',
-      stock: 10,
-    })
+    await request(app)
+      .post('/api/products')
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({
+        name: 'Page Boundary Product 1',
+        price: 100,
+        category: 'PaginationBoundary',
+        stock: 10,
+      })
 
-    await request(app).post('/api/products').send({
-      name: 'Page Boundary Product 2',
-      price: 200,
-      category: 'PaginationBoundary',
-      stock: 10,
-    })
+    await request(app)
+      .post('/api/products')
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({
+        name: 'Page Boundary Product 2',
+        price: 200,
+        category: 'PaginationBoundary',
+        stock: 10,
+      })
 
-    await request(app).post('/api/products').send({
-      name: 'Page Boundary Product 3',
-      price: 300,
-      category: 'PaginationBoundary',
-      stock: 10,
-    })
+    await request(app)
+      .post('/api/products')
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({
+        name: 'Page Boundary Product 3',
+        price: 300,
+        category: 'PaginationBoundary',
+        stock: 10,
+      })
 
     const response = await request(app)
       .get('/api/products')
@@ -150,33 +183,45 @@ describe('Product API', () => {
   })
 
   test('GET /api/products should calculate total pages correctly when total is divisible by limit', async () => {
-    await request(app).post('/api/products').send({
-      name: 'Exact Page Product 1',
-      price: 100,
-      category: 'PaginationExact',
-      stock: 10,
-    })
+    await request(app)
+      .post('/api/products')
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({
+        name: 'Exact Page Product 1',
+        price: 100,
+        category: 'PaginationExact',
+        stock: 10,
+      })
 
-    await request(app).post('/api/products').send({
-      name: 'Exact Page Product 2',
-      price: 200,
-      category: 'PaginationExact',
-      stock: 10,
-    })
+    await request(app)
+      .post('/api/products')
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({
+        name: 'Exact Page Product 2',
+        price: 200,
+        category: 'PaginationExact',
+        stock: 10,
+      })
 
-    await request(app).post('/api/products').send({
-      name: 'Exact Page Product 3',
-      price: 300,
-      category: 'PaginationExact',
-      stock: 10,
-    })
+    await request(app)
+      .post('/api/products')
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({
+        name: 'Exact Page Product 3',
+        price: 300,
+        category: 'PaginationExact',
+        stock: 10,
+      })
 
-    await request(app).post('/api/products').send({
-      name: 'Exact Page Product 4',
-      price: 400,
-      category: 'PaginationExact',
-      stock: 10,
-    })
+    await request(app)
+      .post('/api/products')
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({
+        name: 'Exact Page Product 4',
+        price: 400,
+        category: 'PaginationExact',
+        stock: 10,
+      })
 
     const response = await request(app)
       .get('/api/products')
@@ -199,19 +244,25 @@ describe('Product API', () => {
   })
 
   test('GET /api/products should return newest products first', async () => {
-    const firstResponse = await request(app).post('/api/products').send({
-      name: 'Older Product',
-      price: 100,
-      category: 'Sorting',
-      stock: 10,
-    })
+    const firstResponse = await request(app)
+      .post('/api/products')
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({
+        name: 'Older Product',
+        price: 100,
+        category: 'Sorting',
+        stock: 10,
+      })
 
-    const secondResponse = await request(app).post('/api/products').send({
-      name: 'Newer Product',
-      price: 200,
-      category: 'Sorting',
-      stock: 10,
-    })
+    const secondResponse = await request(app)
+      .post('/api/products')
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({
+        name: 'Newer Product',
+        price: 200,
+        category: 'Sorting',
+        stock: 10,
+      })
 
     expect(firstResponse.statusCode).toBe(201)
     expect(secondResponse.statusCode).toBe(201)
@@ -259,26 +310,35 @@ describe('Product API', () => {
   })
 
   test('GET /api/products should return the remaining products on the final partial page', async () => {
-    await request(app).post('/api/products').send({
-      name: 'Product 1',
-      price: 10,
-      category: 'Electronics',
-      stock: 5,
-    })
+    await request(app)
+      .post('/api/products')
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({
+        name: 'Product 1',
+        price: 10,
+        category: 'Electronics',
+        stock: 5,
+      })
 
-    await request(app).post('/api/products').send({
-      name: 'Product 2',
-      price: 20,
-      category: 'Electronics',
-      stock: 5,
-    })
+    await request(app)
+      .post('/api/products')
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({
+        name: 'Product 2',
+        price: 20,
+        category: 'Electronics',
+        stock: 5,
+      })
 
-    await request(app).post('/api/products').send({
-      name: 'Product 3',
-      price: 30,
-      category: 'Electronics',
-      stock: 5,
-    })
+    await request(app)
+      .post('/api/products')
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({
+        name: 'Product 3',
+        price: 30,
+        category: 'Electronics',
+        stock: 5,
+      })
 
     const response = await request(app)
       .get('/api/products?page=2&limit=2')
@@ -303,19 +363,25 @@ describe('Product API', () => {
   })
 
   test('GET /api/products?category=Electronics should return only matching products', async () => {
-    await request(app).post('/api/products').send({
-      name: 'Test Phone',
-      price: 500,
-      category: 'Electronics',
-      stock: 10,
-    })
+    await request(app)
+      .post('/api/products')
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({
+        name: 'Test Phone',
+        price: 500,
+        category: 'Electronics',
+        stock: 10,
+      })
 
-    await request(app).post('/api/products').send({
-      name: 'Test Shirt',
-      price: 50,
-      category: 'Fashion',
-      stock: 20,
-    })
+    await request(app)
+      .post('/api/products')
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({
+        name: 'Test Shirt',
+        price: 50,
+        category: 'Fashion',
+        stock: 20,
+      })
 
     const response = await request(app)
       .get('/api/products')
@@ -338,26 +404,35 @@ describe('Product API', () => {
     ).toBe(true)
   })
   test('GET /api/products?minPrice=100&maxPrice=500 should return products within price range', async () => {
-    await request(app).post('/api/products').send({
-      name: 'Budget Product',
-      price: 50,
-      category: 'Test',
-      stock: 10,
-    })
+    await request(app)
+      .post('/api/products')
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({
+        name: 'Budget Product',
+        price: 50,
+        category: 'Test',
+        stock: 10,
+      })
 
-    await request(app).post('/api/products').send({
-      name: 'Midrange Product',
-      price: 300,
-      category: 'Test',
-      stock: 10,
-    })
+    await request(app)
+      .post('/api/products')
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({
+        name: 'Midrange Product',
+        price: 300,
+        category: 'Test',
+        stock: 10,
+      })
 
-    await request(app).post('/api/products').send({
-      name: 'Expensive Product',
-      price: 800,
-      category: 'Test',
-      stock: 10,
-    })
+    await request(app)
+      .post('/api/products')
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({
+        name: 'Expensive Product',
+        price: 800,
+        category: 'Test',
+        stock: 10,
+      })
 
     const response = await request(app)
       .get('/api/products')
@@ -381,33 +456,45 @@ describe('Product API', () => {
   })
 
   test('GET /api/products should combine category and price filters', async () => {
-    await request(app).post('/api/products').send({
-      name: 'Electronics Cheap',
-      price: 50,
-      category: 'CombinedFilter',
-      stock: 10,
-    })
+    await request(app)
+      .post('/api/products')
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({
+        name: 'Electronics Cheap',
+        price: 50,
+        category: 'CombinedFilter',
+        stock: 10,
+      })
 
-    await request(app).post('/api/products').send({
-      name: 'Electronics Midrange',
-      price: 300,
-      category: 'CombinedFilter',
-      stock: 10,
-    })
+    await request(app)
+      .post('/api/products')
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({
+        name: 'Electronics Midrange',
+        price: 300,
+        category: 'CombinedFilter',
+        stock: 10,
+      })
 
-    await request(app).post('/api/products').send({
-      name: 'Fashion Midrange',
-      price: 300,
-      category: 'Fashion',
-      stock: 10,
-    })
+    await request(app)
+      .post('/api/products')
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({
+        name: 'Fashion Midrange',
+        price: 300,
+        category: 'Fashion',
+        stock: 10,
+      })
 
-    await request(app).post('/api/products').send({
-      name: 'Electronics Expensive',
-      price: 800,
-      category: 'CombinedFilter',
-      stock: 10,
-    })
+    await request(app)
+      .post('/api/products')
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({
+        name: 'Electronics Expensive',
+        price: 800,
+        category: 'CombinedFilter',
+        stock: 10,
+      })
 
     const response = await request(app)
       .get('/api/products')
@@ -428,26 +515,35 @@ describe('Product API', () => {
     )
   })
   test('GET /api/products should combine search and sorting', async () => {
-    await request(app).post('/api/products').send({
-      name: 'Samsung Galaxy A',
-      price: 800,
-      category: 'SearchSort',
-      stock: 10,
-    })
+    await request(app)
+      .post('/api/products')
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({
+        name: 'Samsung Galaxy A',
+        price: 800,
+        category: 'SearchSort',
+        stock: 10,
+      })
 
-    await request(app).post('/api/products').send({
-      name: 'Samsung Galaxy B',
-      price: 500,
-      category: 'SearchSort',
-      stock: 10,
-    })
+    await request(app)
+      .post('/api/products')
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({
+        name: 'Samsung Galaxy B',
+        price: 500,
+        category: 'SearchSort',
+        stock: 10,
+      })
 
-    await request(app).post('/api/products').send({
-      name: 'Wireless Keyboard',
-      price: 100,
-      category: 'SearchSort',
-      stock: 10,
-    })
+    await request(app)
+      .post('/api/products')
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({
+        name: 'Wireless Keyboard',
+        price: 100,
+        category: 'SearchSort',
+        stock: 10,
+      })
 
     const response = await request(app)
       .get('/api/products')
@@ -510,19 +606,25 @@ describe('Product API', () => {
   })
 
   test('GET /api/products?search should return matching products case-insensitively', async () => {
-    await request(app).post('/api/products').send({
-      name: 'Samsung Galaxy Phone',
-      price: 800,
-      category: 'Electronics',
-      stock: 10,
-    })
+    await request(app)
+      .post('/api/products')
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({
+        name: 'Samsung Galaxy Phone',
+        price: 800,
+        category: 'Electronics',
+        stock: 10,
+      })
 
-    await request(app).post('/api/products').send({
-      name: 'Wireless Keyboard',
-      price: 100,
-      category: 'Electronics',
-      stock: 10,
-    })
+    await request(app)
+      .post('/api/products')
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({
+        name: 'Wireless Keyboard',
+        price: 100,
+        category: 'Electronics',
+        stock: 10,
+      })
 
     const response = await request(app)
       .get('/api/products')
@@ -534,19 +636,25 @@ describe('Product API', () => {
   })
 
   test('GET /api/products?sort=price&order=asc should sort products by price ascending', async () => {
-    await request(app).post('/api/products').send({
-      name: 'Expensive Product',
-      price: 900,
-      category: 'sortingTest',
-      stock: 10,
-    })
+    await request(app)
+      .post('/api/products')
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({
+        name: 'Expensive Product',
+        price: 900,
+        category: 'sortingTest',
+        stock: 10,
+      })
 
-    await request(app).post('/api/products').send({
-      name: 'Cheap Product',
-      price: 100,
-      category: 'sortingTest',
-      stock: 10,
-    })
+    await request(app)
+      .post('/api/products')
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({
+        name: 'Cheap Product',
+        price: 100,
+        category: 'sortingTest',
+        stock: 10,
+      })
 
     const response = await request(app)
       .get('/api/products')
@@ -559,19 +667,25 @@ describe('Product API', () => {
   })
 
   test('GET /api/products?sort=price&order=desc should sort products by price descending', async () => {
-    await request(app).post('/api/products').send({
-      name: 'Cheap Product',
-      price: 100,
-      category: 'sortingTestDesc',
-      stock: 10,
-    })
+    await request(app)
+      .post('/api/products')
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({
+        name: 'Cheap Product',
+        price: 100,
+        category: 'sortingTestDesc',
+        stock: 10,
+      })
 
-    await request(app).post('/api/products').send({
-      name: 'Expensive ProductDesc',
-      price: 900,
-      category: 'sortingTestDesc',
-      stock: 10,
-    })
+    await request(app)
+      .post('/api/products')
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({
+        name: 'Expensive ProductDesc',
+        price: 900,
+        category: 'sortingTestDesc',
+        stock: 10,
+      })
 
     const response = await request(app)
       .get('/api/products')
@@ -600,12 +714,15 @@ describe('Product API', () => {
   })
 
   test('GET /api/products?fields should return only requested fields', async () => {
-    await request(app).post('/api/products').send({
-      name: 'Field Selection Product',
-      price: 500,
-      category: 'FieldSelection',
-      stock: 15,
-    })
+    await request(app)
+      .post('/api/products')
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({
+        name: 'Field Selection Product',
+        price: 500,
+        category: 'FieldSelection',
+        stock: 15,
+      })
 
     const response = await request(app)
       .get('/api/products')
@@ -648,7 +765,10 @@ describe('Product API', () => {
       stock: 10,
     }
 
-    const response = await request(app).post('/api/products').send(newProduct)
+    const response = await request(app)
+      .post('/api/products')
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send(newProduct)
 
     expect(response.statusCode).toBe(201)
     expect(response.body.name).toBe(newProduct.name)
@@ -657,6 +777,54 @@ describe('Product API', () => {
     expect(response.body.stock).toBe(newProduct.stock)
     expect(response.body._id).toBeDefined()
   })
+
+  test('POST /api/products should reject requests without a token', async () => {
+    const response = await request(app).post('/api/products').send({
+      name: 'Unauthenticated Product',
+      price: 50,
+      category: 'Electronics',
+      stock: 5,
+    })
+
+    expect(response.statusCode).toBe(401)
+    expect(response.body.message).toBe('Authentication required')
+  })
+
+  test('POST /api/products should reject customers', async () => {
+    const customerToken = createAuthToken({
+      id: 'test-customer-id',
+      role: 'customer',
+    })
+
+    const response = await request(app)
+      .post('/api/products')
+      .set('Authorization', `Bearer ${customerToken}`)
+      .send({
+        name: 'Customer Product',
+        price: 50,
+        category: 'Electronics',
+        stock: 5,
+      })
+
+    expect(response.statusCode).toBe(403)
+    expect(response.body.message).toBe('Access denied')
+  })
+
+  test('POST /api/products should allow admins to create products', async () => {
+    const response = await request(app)
+      .post('/api/products')
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({
+        name: 'Admin Product',
+        price: 75,
+        category: 'Electronics',
+        stock: 8,
+      })
+
+    expect(response.statusCode).toBe(201)
+    expect(response.body.name).toBe('Admin Product')
+  })
+
   test('POST /api/products should reject invalid product data', async () => {
     const invalidProduct = {
       name: '',
@@ -667,6 +835,7 @@ describe('Product API', () => {
 
     const response = await request(app)
       .post('/api/products')
+      .set('Authorization', `Bearer ${adminToken}`)
       .send(invalidProduct)
 
     expect(response.statusCode).toBe(400)
@@ -690,6 +859,7 @@ describe('Product API', () => {
 
     const createResponse = await request(app)
       .post('/api/products')
+      .set('Authorization', `Bearer ${adminToken}`)
       .send(newProduct)
 
     expect(createResponse.statusCode).toBe(201)
@@ -727,6 +897,7 @@ describe('Product API', () => {
 
     const createResponse = await request(app)
       .post('/api/products')
+      .set('Authorization', `Bearer ${adminToken}`)
       .send(newProduct)
 
     expect(createResponse.statusCode).toBe(201)
@@ -761,6 +932,7 @@ describe('Product API', () => {
 
     const createResponse = await request(app)
       .post('/api/products')
+      .set('Authorization', `Bearer ${adminToken}`)
       .send(newProduct)
 
     expect(createResponse.statusCode).toBe(201)
@@ -799,6 +971,7 @@ describe('Product API', () => {
 
     const createResponse = await request(app)
       .post('/api/products')
+      .set('Authorization', `Bearer ${adminToken}`)
       .send(newProduct)
 
     expect(createResponse.statusCode).toBe(201)
@@ -829,6 +1002,7 @@ describe('Product API', () => {
 
     const createResponse = await request(app)
       .post('/api/products')
+      .set('Authorization', `Bearer ${adminToken}`)
       .send(newProduct)
 
     expect(createResponse.statusCode).toBe(201)
@@ -855,6 +1029,7 @@ describe('Product API', () => {
 
     const createResponse = await request(app)
       .post('/api/products')
+      .set('Authorization', `Bearer ${adminToken}`)
       .send(newProduct)
 
     expect(createResponse.statusCode).toBe(201)
@@ -881,6 +1056,7 @@ describe('Product API', () => {
 
     const createResponse = await request(app)
       .post('/api/products')
+      .set('Authorization', `Bearer ${adminToken}`)
       .send(newProduct)
 
     expect(createResponse.statusCode).toBe(201)
