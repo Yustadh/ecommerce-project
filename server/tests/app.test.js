@@ -696,6 +696,45 @@ describe('Product API', () => {
       900, 100,
     ])
   })
+
+  test('GET /api/products should use a consistent tie-breaker when sorting equal prices', async () => {
+    const category = 'EqualPriceSorting'
+
+    for (const name of ['Product A', 'Product B', 'Product C']) {
+      await request(app)
+        .post('/api/products')
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send({
+          name,
+          price: 100,
+          category,
+          stock: 10,
+        })
+        .expect(201)
+    }
+
+    const firstPage = await request(app)
+      .get('/api/products')
+      .query({ category, sort: 'price', order: 'asc', page: 1, limit: 2 })
+      .expect(200)
+
+    const secondPage = await request(app)
+      .get('/api/products')
+      .query({ category, sort: 'price', order: 'asc', page: 2, limit: 2 })
+      .expect(200)
+
+    const firstPageIds = firstPage.body.products.map((product) => product._id)
+    const secondPageIds = secondPage.body.products.map((product) => product._id)
+
+    expect(firstPage.body.products).toHaveLength(2)
+    expect(secondPage.body.products).toHaveLength(1)
+    expect(new Set([...firstPageIds, ...secondPageIds]).size).toBe(3)
+
+    const allIds = [...firstPageIds, ...secondPageIds]
+
+    expect(allIds).toEqual([...allIds].sort((a, b) => b.localeCompare(a)))
+  })
+
   test('GET /api/products?sort should reject an invalid sort field', async () => {
     const response = await request(app)
       .get('/api/products')
@@ -737,6 +776,56 @@ describe('Product API', () => {
     expect(response.body.products[0].price).toBe(500)
     expect(response.body.products[0].category).toBeUndefined()
     expect(response.body.products[0].stock).toBeUndefined()
+  })
+
+  test('GET /api/products should combine pagination, sorting, and field selection', async () => {
+    const category = 'CombinedQuery'
+
+    const products = [
+      { name: 'Product A', price: 300, category, stock: 10 },
+      { name: 'Product B', price: 100, category, stock: 20 },
+      { name: 'Product C', price: 200, category, stock: 30 },
+    ]
+
+    for (const product of products) {
+      await request(app)
+        .post('/api/products')
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send(product)
+        .expect(201)
+    }
+
+    const response = await request(app)
+      .get('/api/products')
+      .query({
+        category,
+        sort: 'price',
+        order: 'asc',
+        page: 1,
+        limit: 2,
+        fields: 'name,price',
+      })
+      .expect(200)
+
+    expect(response.body.products).toHaveLength(2)
+    expect(response.body.products.map((product) => product.price)).toEqual([
+      100, 200,
+    ])
+
+    expect(response.body.products[0].name).toBe('Product B')
+    expect(response.body.products[1].name).toBe('Product C')
+
+    for (const product of response.body.products) {
+      expect(product.category).toBeUndefined()
+      expect(product.stock).toBeUndefined()
+    }
+
+    expect(response.body.pagination).toEqual({
+      page: 1,
+      limit: 2,
+      total: 3,
+      totalPages: 2,
+    })
   })
 
   test('GET /api/products?fields should reject unknown fields', async () => {
