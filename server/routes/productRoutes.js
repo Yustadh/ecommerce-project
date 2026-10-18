@@ -39,6 +39,6 @@ router.patch(
   validateUpdateProduct,
   patchProduct,
 )
-router.delete('/:id', deleteProduct)
+router.delete('/:id', authenticate, authorize('admin'), deleteProduct)
 
 export default router

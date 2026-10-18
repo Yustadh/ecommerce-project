@@ -1115,6 +1115,30 @@ describe('Product API', () => {
     expect(response.body.message).toBe('Validation failed')
     expect(response.body.errors).toContain('Unknown field: discount')
   })
+
+  test('DELETE /api/products/:id should reject requests without a token', async () => {
+    const response = await request(app).delete(
+      '/api/products/507f1f77bcf86cd799439011',
+    )
+
+    expect(response.statusCode).toBe(401)
+    expect(response.body.message).toBe('Authentication required')
+  })
+
+  test('DELETE /api/products/:id should reject customers', async () => {
+    const customerToken = createAuthToken({
+      id: 'test-customer-id',
+      role: 'customer',
+    })
+
+    const response = await request(app)
+      .delete('/api/products/507f1f77bcf86cd799439011')
+      .set('Authorization', `Bearer ${customerToken}`)
+
+    expect(response.statusCode).toBe(403)
+    expect(response.body.message).toBe('Access denied')
+  })
+
   test('DELETE /api/products/:id should delete an existing product', async () => {
     const newProduct = {
       name: 'Delete Test Product',
@@ -1132,9 +1156,9 @@ describe('Product API', () => {
 
     const productId = createResponse.body._id
 
-    const deleteResponse = await request(app).delete(
-      `/api/products/${productId}`,
-    )
+    const deleteResponse = await request(app)
+      .delete(`/api/products/${productId}`)
+      .set('Authorization', `Bearer ${adminToken}`)
 
     expect(deleteResponse.statusCode).toBe(204)
     expect(deleteResponse.body).toEqual({})
@@ -1147,7 +1171,9 @@ describe('Product API', () => {
   test('DELETE /api/products/:id should return 404 for a non-existent product', async () => {
     const nonExistentId = '507f1f77bcf86cd799439011'
 
-    const response = await request(app).delete(`/api/products/${nonExistentId}`)
+    const response = await request(app)
+      .delete(`/api/products/${nonExistentId}`)
+      .set('Authorization', `Bearer ${adminToken}`)
 
     expect(response.statusCode).toBe(404)
     expect(response.body.message).toBe('Product not found')
